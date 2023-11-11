@@ -67,3 +67,7 @@ echo
 # Test: Attempt to Get Deleted Product
 echo "=== Attempting to get deleted product id: the_odyssey_2 ==="
 curl -s "${STD_APP_URL}/products/the_odyssey_2" | jq .
+
+# Test: List Orders
+echo "=== Listing Orders ==="
+curl -s "${STD_APP_URL}/orders" | jq .

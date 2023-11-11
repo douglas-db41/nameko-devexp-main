@@ -94,3 +94,18 @@ def test_can_update_order(orders_rpc, order):
 def test_can_delete_order(orders_rpc, order, db_session):
     orders_rpc.delete_order(order.id)
     assert not db_session.query(Order).filter_by(id=order.id).count()
+
+
+@pytest.mark.usefixtures('db_session')
+def test_list_orders(orders_rpc, order):
+    response = orders_rpc.list_orders()
+    assert len(response) == 1
+    assert response[0]['id'] == order.id
+
+
+@pytest.mark.usefixtures('db_session')
+def test_list_orders_by_product_id(orders_rpc, order_details):
+    product_id = order_details[0].product_id
+    response = orders_rpc.list_orders_by_product_id(product_id)
+    assert len(response) == 1
+    assert response[0]['order_details'][0]['product_id'] == product_id

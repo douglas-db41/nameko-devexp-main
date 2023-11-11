@@ -120,6 +120,25 @@ scenarios:
         - 204
         subject: http-code
         not: false
+
+    # 6. List Orders
+    - url: /orders
+      label: orders-list
+      think-time: uniform(0s, 0s)
+      method: GET
+      
+      assert:
+      - contains:
+        - 200
+        subject: http-code
+        not: false
+      extract-jsonpath:
+        orders: $..id
+        default: NOT_FOUND
+        
+    - if: '"${orders}" == "NOT_FOUND"'
+      then:
+        - action: continue
   
 reporting:
 - module: final-stats
