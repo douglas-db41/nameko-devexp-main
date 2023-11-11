@@ -52,3 +52,18 @@ ID=$(echo ${ORDER_ID} | jq '.id')
 # Test: Get Order back
 echo "=== Getting Order ==="
 curl -s "${STD_APP_URL}/orders/${ID}" | jq .
+
+# Test: Delete Product
+echo "=== Deleting product id: the_odyssey_2 ==="
+echo "=== Creating a product to delete with id: the_odyssey_2 ==="
+curl -s -XPOST  "${STD_APP_URL}/products" \
+    -H 'accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '{"id": "the_odyssey_2", "title": "The Odyssey 2", "passenger_capacity": 101, "maximum_speed": 5, "in_stock": 10}'
+echo
+curl -s -XDELETE "${STD_APP_URL}/products/the_odyssey_2"
+echo
+
+# Test: Attempt to Get Deleted Product
+echo "=== Attempting to get deleted product id: the_odyssey_2 ==="
+curl -s "${STD_APP_URL}/products/the_odyssey_2" | jq .
