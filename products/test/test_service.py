@@ -3,6 +3,7 @@ from nameko.testing.services import entrypoint_hook
 from nameko.standalone.events import event_dispatcher
 from nameko.testing.services import entrypoint_waiter
 import pytest
+from pytest_mock import mocker
 
 from products.dependencies import NotFound
 from products.service import ProductsService
@@ -168,3 +169,14 @@ def test_delete_product_fails_on_not_found(service_container):
     with pytest.raises(NotFound):
         with entrypoint_hook(service_container, 'delete') as delete:
             delete(111)
+
+def test_delete_product_fails_when_in_use(service_container, mocker):
+
+    mocker.patch(
+        'orders.service.OrdersService.list_orders_by_product_id',
+        return_value=[{'id': 1, 'product_id': 'test_in_use'}]
+    )
+
+    with pytest.raises(ProductInUse):
+        with entrypoint_hook(service_container, 'delete') as delete:
+            delete('test_in_use')

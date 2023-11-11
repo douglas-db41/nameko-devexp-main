@@ -9,6 +9,14 @@ execution:
   ramp-up: 1m
   hold-for: 12h
   scenario: nex
+- concurrency: 1
+  ramp-up: 1m
+  hold-for: 12h
+  scenario: nex2
+- concurrency: 1
+  ramp-up: 1m
+  hold-for: 12h
+  scenario: nex3
       
 scenarios:
   nex:
@@ -117,7 +125,7 @@ scenarios:
 
       assert:
       - contains:
-        - 204
+        - 409
         subject: http-code
         not: false
 
@@ -139,6 +147,72 @@ scenarios:
     - if: '"${orders}" == "NOT_FOUND"'
       then:
         - action: continue
+
+  nex2:
+    data-sources:
+    - ./test/nex-users2.csv
+    variables:
+    default-address: http://localhost:8000
+    requests:
+    # 1. Create Product
+    - url: /products
+      label: products-create
+      think-time: uniform(0s, 0s)
+      method: POST
+      headers:
+        cache-control: no-cache
+        Content-Type: application/json
+      body: 'request-body-string'
+      body: >
+        {
+          "id": "${id}-${__javaScript(Math.random())}",
+          "title": "${title}",
+          "passenger_capacity": ${passenger_capacity},
+          "maximum_speed": ${maximum_speed},
+          "in_stock": ${in_stock}
+        }          
+      assert:
+      - contains:
+        - 200
+        subject: http-code
+        not: false
+      extract-jsonpath:
+        product_id: $.id
+        default: NOT_FOUND
+
+    - if: '"${product_id}" == "NOT_FOUND"'
+      then:
+        - action: continue
+    
+    # 2. Delete Product
+    - url: /products/${product_id}
+      label: product-delete
+      think-time: uniform(0s, 0s)
+      method: DELETE
+
+      assert:
+      - contains:
+        - 204
+        subject: http-code
+        not: false
+
+  nex3:
+    data-sources:
+    - ./test/nex-users3.csv
+    variables:
+    default-address: http://localhost:8000
+    requests:
+    # 1. Delete Product
+    - url: /products/${product_id}
+      label: product-delete
+      think-time: uniform(0s, 0s)
+      method: DELETE
+
+      assert:
+      - contains:
+        - 404
+        subject: http-code
+        not: false
   
 reporting:
 - module: final-stats

@@ -3,6 +3,7 @@ from fastapi.params import Depends
 from gateapi.api.dependencies import get_rpc
 from gateapi.api import schemas
 from .exceptions import ProductNotFound
+from products.exceptions import ProductInUse
 
 router = APIRouter(
     prefix = "/products",
@@ -36,5 +37,10 @@ def delete_product(product_id: str, rpc=Depends(get_rpc)):
     except ProductNotFound as error:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(error)
+        )
+    except ProductInUse as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
             detail=str(error)
         )
