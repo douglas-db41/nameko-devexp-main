@@ -1,6 +1,7 @@
 from nameko.events import EventDispatcher
 from nameko.rpc import rpc
 from nameko_sqlalchemy import DatabaseSession
+from sqlalchemy.orm import joinedload
 
 from orders.exceptions import NotFound
 from orders.models import DeclarativeBase, Order, OrderDetail
