@@ -7,7 +7,7 @@ from nameko.rpc import RpcProxy
 from werkzeug import Response
 
 from gateway.entrypoints import http
-from gateway.exceptions import OrderNotFound, ProductNotFound
+from gateway.exceptions import OrderNotFound, ProductNotFound, ProductInUse
 from gateway.schemas import CreateOrderSchema, GetOrderSchema, ProductSchema
 
 
