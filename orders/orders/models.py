@@ -40,6 +40,10 @@ class OrderDetail(DeclarativeBase):
         nullable=False
     )
     order = relationship(Order, backref="order_details")
-    product_id = Column(Integer, nullable=False)
+    product_id = Column(
+        Integer, 
+        ForeignKey("products.id"), 
+        nullable=False)
+    product = relationship("Product") 
     price = Column(DECIMAL(18, 2), nullable=False)
     quantity = Column(Integer, nullable=False)
