@@ -69,17 +69,9 @@ def _create_order(order_data, nameko_rpc):
     
 @router.get("/", response_model=List[schemas.Order])
 def list_orders(rpc=Depends(get_rpc)):
-    try:
-        return _list_orders(rpc)
-    except OrderNotFound as error:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(error)
-        )
-
-def _list_orders(nameko_rpc):
     # Call orders-service to retrieve the data.
-    with nameko_rpc.next() as nameko:
+    with rpc.next() as nameko:
         orders = nameko.orders.list_orders()
 
     return orders
+    

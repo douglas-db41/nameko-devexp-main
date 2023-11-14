@@ -172,3 +172,34 @@ class GatewayService(object):
             serialized_data['order_details']
         )
         return result['id']
+
+    @http(
+        "DELETE", "/products/<string:product_id>",
+        expected_exceptions=(ProductNotFound, ProductInUse)
+    )
+    def delete_product(self, request, product_id):
+        """Deletes a product with the given `product_id`
+        """
+        try:
+            self.products_rpc.delete(product_id)
+        except RemoteError as error:
+            if error.exc_type == 'ProductInUse':
+                raise ProductInUse(str(error.value))
+            elif error.exc_type == 'ProductNotFound':
+                raise ProductNotFound(str(error.value))
+
+        return Response(status=204)
+
+    @http("GET", "/orders")
+    def list_orders(self, request):
+        """List all orders
+        """
+        try:
+            # Call orders-service to retrieve the data
+            orders = self._list_orders()
+            return Response(OrderSchema().dumps(orders).data, mimetype='application/json')
+
+    def _list_orders(self):
+        with self.orders_rpc.next() as nameko:
+            orders = nameko.orders.list_orders()
+        return orders
