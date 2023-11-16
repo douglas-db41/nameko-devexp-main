@@ -185,10 +185,9 @@ class GatewayService(object):
     def list_orders(self, request):
         """List all orders
         """
-        try:
-            # Call orders-service to retrieve the data
-            orders = self._list_orders()
-            return Response(OrderSchema().dumps(orders).data, mimetype='application/json')
+        # Call orders-service to retrieve the data
+        orders = self._list_orders()
+        return Response(OrderSchema().dumps(orders).data, mimetype='application/json')
 
     def _list_orders(self):
         with self.orders_rpc.next() as nameko:

@@ -16,9 +16,11 @@ class OrdersService:
 
     @rpc
     def get_order(self, order_id):
-        order = self.db.query(Order)
+        order = (
+            self.db.query(Order)
             .options(joinedload(Order.order_details).joinedload(OrderDetail.product))
             .get(order_id)
+        )
 
         if not order:
             raise NotFound('Order with id {} not found'.format(order_id))

@@ -2,6 +2,7 @@ import logging
 
 from nameko.events import event_handler
 from nameko.rpc import rpc
+from nameko.rpc import RpcProxy
 
 from products import dependencies, schemas
 from products.exceptions import ProductInUse
