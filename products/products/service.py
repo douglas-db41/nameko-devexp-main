@@ -21,16 +21,16 @@ class ProductsService:
     @rpc
     def get(self, product_id):
         product = self.storage.get(product_id)
-        return schemas.Product().dump(product).data
+        return schemas.Product().dump(product)
 
     @rpc
     def list(self):
         products = self.storage.list()
-        return schemas.Product(many=True).dump(products).data
+        return schemas.Product(many=True).dump(products)
 
     @rpc
     def create(self, product):
-        product = schemas.Product(strict=True).load(product).data
+        product = schemas.Product().load(product)
         self.storage.create(product)
     
     @rpc

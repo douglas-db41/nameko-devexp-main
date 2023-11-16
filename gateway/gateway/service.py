@@ -30,7 +30,7 @@ class GatewayService(object):
         """
         product = self.products_rpc.get(product_id)
         return Response(
-            ProductSchema().dumps(product).data,
+            ProductSchema().dumps(product),
             mimetype='application/json'
         )
 
@@ -58,13 +58,13 @@ class GatewayService(object):
 
         """
 
-        schema = ProductSchema(strict=True)
+        schema = ProductSchema()
 
         try:
             # load input data through a schema (for validation)
             # Note - this may raise `ValueError` for invalid json,
             # or `ValidationError` if data is invalid.
-            product_data = schema.loads(request.get_data(as_text=True)).data
+            product_data = schema.loads(request.get_data(as_text=True))
         except ValueError as exc:
             raise BadRequest("Invalid json: {}".format(exc))
 
@@ -83,7 +83,7 @@ class GatewayService(object):
         """
         order = self._get_order(order_id)
         return Response(
-            GetOrderSchema().dumps(order).data,
+            GetOrderSchema().dumps(order),
             mimetype='application/json'
         )
 
@@ -131,13 +131,13 @@ class GatewayService(object):
 
         """
 
-        schema = CreateOrderSchema(strict=True)
+        schema = CreateOrderSchema()
 
         try:
             # load input data through a schema (for validation)
             # Note - this may raise `ValueError` for invalid json,
             # or `ValidationError` if data is invalid.
-            order_data = schema.loads(request.get_data(as_text=True)).data
+            order_data = schema.loads(request.get_data(as_text=True))
         except ValueError as exc:
             raise BadRequest("Invalid json: {}".format(exc))
 
@@ -158,7 +158,7 @@ class GatewayService(object):
         # Call orders-service to create the order.
         # Dump the data through the schema to ensure the values are serialized
         # correctly.
-        serialized_data = CreateOrderSchema().dump(order_data).data
+        serialized_data = CreateOrderSchema().dump(order_data)
         result = self.orders_rpc.create_order(
             serialized_data['order_details']
         )
@@ -173,7 +173,7 @@ class GatewayService(object):
         """
         try:
             self.products_rpc.delete(product_id)
-        except RemoteError as error:
+        except remote_error as error:
             if error.exc_type == 'ProductInUse':
                 raise ProductInUse(str(error.value))
             elif error.exc_type == 'ProductNotFound':
@@ -187,7 +187,7 @@ class GatewayService(object):
         """
         # Call orders-service to retrieve the data
         orders = self._list_orders()
-        return Response(OrderSchema().dumps(orders).data, mimetype='application/json')
+        return Response(OrderSchema().dumps(orders), mimetype='application/json')
 
     def _list_orders(self):
         with self.orders_rpc.next() as nameko:
